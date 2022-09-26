@@ -1,9 +1,15 @@
 import React from 'react';
+import Cards from './Cards';
+import {Container, Row, Col} from 'react-bootstrap';
 function App() {
   return (
-    <div className="App">
-      <h2> You </h2>
-    </div>
+    <Container>
+     <Row>
+      <Col>
+       <Cards/>
+      </Col>
+     </Row>
+  </Container>
   );
 }
 
