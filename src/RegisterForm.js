@@ -1,12 +1,14 @@
-import {useState}  from 'react';
-import { getDatabase, ref, set } from "firebase/database";
-import {Button, Form} from 'react-bootstrap';
+import {useState, useEffect}  from 'react';
+import { getDatabase, ref, set, push, onValue} from "firebase/database";
+import {Button, Form, Table} from 'react-bootstrap';
 
 function RegisterForm() {
     const db = getDatabase();
     let [batchNo, setBatchNo] = useState("");
     let [classNo, setClassNo] = useState("");
     let [batchName, setClassTopic] = useState("");
+    let [details, setDetails] = useState([]);
+   
 
     let handleBatchNo = (e) => {
         setBatchNo(e.target.value);
@@ -37,11 +39,19 @@ function RegisterForm() {
             batchname: batchName,
             present: arr,
         };
-
-        set(ref(db, 'attendance/' ), info);
-     };
+        set( push(ref(db, 'attendance' )), info);
+        
+    };
     
+    useEffect(() => {
+        onValue(ref(db, 'attendance' ), (snapshot) => {
+            const data = snapshot.val();
+            setDetails(data);
+          });
+     }, []); 
+
   return (
+      <>
         <Form>
             <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Batch Number</Form.Label>
@@ -60,7 +70,7 @@ function RegisterForm() {
                 <Form.Control type="text" onChange={handleClassTopic} placeholder="Class Topic" />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicCheckbox1">
-                <Form.Check type="checkbox" onChange={() => handleAttendance("kawsik")} label="kawsik"/>
+                <Form.Check type="checkbox" onChange={() => handleAttendance("Kawsik")} label="Kawsik"/>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicCheckbox2">
                 <Form.Check type="checkbox" onChange={() => handleAttendance("Remon")} label="Remon"/>
@@ -78,6 +88,32 @@ function RegisterForm() {
                 Submit
             </Button>
         </Form>
+
+        
+        <Table striped bordered hover className="mt-5">
+            <thead>
+                <tr>
+                <th>#</th>
+                <th>Batch No</th>
+                <th>Class Number</th>
+                <th>Class Topic</th>
+                <th>Students</th>
+                </tr>
+            </thead>
+            <tbody>
+                {details.map((item) => (
+                <tr>
+                    <td>1</td>
+                    <td>Test</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    <td>@mdo</td>
+                </tr>
+                ))}
+                
+            </tbody>
+        </Table>
+        </>
   )
 }
 
