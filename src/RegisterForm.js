@@ -8,6 +8,7 @@ function RegisterForm() {
     let [classNo, setClassNo] = useState("");
     let [batchName, setClassTopic] = useState("");
     let [details, setDetails] = useState([]);
+    let [check, setCheck] = useState("");
    
 
     let handleBatchNo = (e) => {
@@ -39,16 +40,21 @@ function RegisterForm() {
             batchname: batchName,
             present: arr,
         };
-        set( push(ref(db, 'attendance' )), info);
-        
+        set( push(ref(db, 'attendance' )), info).then(()=> {
+            setCheck(!check);
+        });  
     };
-    
+
     useEffect(() => {
-        onValue(ref(db, 'attendance' ), (snapshot) => {
-            const data = snapshot.val();
-            setDetails(data);
-          });
-     }, []); 
+        let attarr = [];
+        onValue(ref(db, 'attendance'), (snapshot) => {
+            snapshot.forEach((item) => {
+                attarr.push(item.val())
+            })
+            setDetails(attarr);
+        })
+    }, [check]);
+    
 
   return (
       <>
@@ -56,9 +62,6 @@ function RegisterForm() {
             <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Batch Number</Form.Label>
                 <Form.Control type="text" onChange={handleBatchNo}  placeholder="Enter Batch Number" />
-                {/* <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-                </Form.Text> */}
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -93,28 +96,35 @@ function RegisterForm() {
         <Table striped bordered hover className="mt-5">
             <thead>
                 <tr>
-                <th>#</th>
-                <th>Batch No</th>
-                <th>Class Number</th>
-                <th>Class Topic</th>
-                <th>Students</th>
+                    <th>Batch No</th>
+                    <th>Class Number</th>
+                    <th>Class Topic</th>
+                    <th>Students</th>
                 </tr>
             </thead>
-            <tbody>
-                {details.map((item) => (
-                <tr>
-                    <td>1</td>
-                    <td>Test</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                </tr>
-                ))}
-                
+            <tbody> 
+                {details.map(item =>(
+                    <tr>
+                        <td>{item.batchname}</td>
+                        <td>{item.batchno}</td>
+                        <td>{item.classno}</td>
+                        <td>
+                        <Table>
+                            <tbody>
+                                {item.present.map(students => (
+                                <tr>
+                                    <td>{students}</td>
+                                </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                        </td>
+                    </tr>
+                ))}               
             </tbody>
         </Table>
         </>
   )
 }
-
+  {/* <td>{item.present}</td> */}
 export default RegisterForm
